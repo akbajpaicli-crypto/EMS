@@ -1,0 +1,41 @@
+{
+  "name": "wcr-ems-firebase",
+  "version": "1.0.0",
+  "private": true,
+  "description": "WCR EMS — West Central Railway Employee Management System (Firebase Edition) | Developed by A K Bajpai, CLI, Jabalpur Division, WCR",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "seed:firebase": "tsx scripts/seed-firebase.ts",
+    "firebase:deploy:rules": "firebase deploy --only firestore:rules,firestore:indexes,storage"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "^1.10.0",
+    "exceljs": "^4.4.0",
+    "firebase": "^11.1.0",
+    "firebase-admin": "^13.0.1",
+    "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.4",
+    "lucide-react": "^0.468.0",
+    "next": "15.5.9",
+    "nodemailer": "^6.9.16",
+    "otpauth": "^9.3.5",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "xlsx": "^0.18.5",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/nodemailer": "^6.4.17",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

@@ -1,0 +1,102 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function userDoc() {
+      return get(/databases/$(database)/documents/users/$(request.auth.token.email)).data;
+    }
+    function isActive() {
+      return isSignedIn() && userDoc().is_active == true;
+    }
+    function isHQ() {
+      return isActive() && userDoc().role_code == 'HQ_ADMIN';
+    }
+    function canAccessScope(divCode, depotId) {
+      let u = userDoc();
+      return isActive() && (
+        u.role_code == 'HQ_ADMIN' ||
+        (u.assigned_division == 'ALL' && u.role_code == 'VIEWER') ||
+        (u.assigned_division == divCode && u.assigned_depot_id == 'ALL') ||
+        (u.assigned_depot_id == depotId)
+      );
+    }
+    function canWriteScope(divCode, depotId) {
+      let u = userDoc();
+      return isActive() && u.role_code != 'VIEWER' && canAccessScope(divCode, depotId);
+    }
+
+    match /users/{email} {
+      allow read: if isSignedIn() && (request.auth.token.email == email || isHQ());
+      allow write: if isHQ();
+    }
+
+    match /depot_master/{depotId} {
+      allow read: if isActive();
+      allow create, update: if isHQ();
+      allow delete: if false; // Never physically delete a depot
+    }
+
+    match /designation_master/{code} {
+      allow read: if isActive();
+      allow write: if isHQ();
+    }
+
+    match /cadre_master/{code} {
+      allow read: if isActive();
+      allow write: if isHQ();
+    }
+
+    match /employee_master/{empNo} {
+      allow read: if canAccessScope(resource.data.division_code, resource.data.depot_id);
+      allow create: if canWriteScope(request.resource.data.division_code, request.resource.data.depot_id);
+      allow update: if canWriteScope(resource.data.division_code, resource.data.depot_id)
+                    && request.resource.data.emp_no == resource.data.emp_no; // Immutable emp_no
+      allow delete: if false;
+    }
+
+    match /sanctioned_strength/{ssId} {
+      allow read: if canAccessScope(resource.data.division_code, resource.data.depot_id);
+      allow create, update: if canWriteScope(request.resource.data.division_code, request.resource.data.depot_id);
+      allow delete: if false; // Historical preservation
+    }
+
+    match /promotion_history/{promoId} {
+      allow read: if canAccessScope(resource.data.division_code, resource.data.depot_id);
+      allow create: if canWriteScope(request.resource.data.division_code, request.resource.data.depot_id)
+                    && (!request.resource.data.is_channel_exception || isHQ());
+      allow update, delete: if false;
+    }
+
+    match /drafting_history/{draftId} {
+      allow read: if canAccessScope(resource.data.original_division, resource.data.original_depot_id);
+      allow create, update: if canWriteScope(request.resource.data.original_division, request.resource.data.original_depot_id);
+      allow delete: if false;
+    }
+
+    match /transfer_history/{txId} {
+      allow read: if canAccessScope(resource.data.previous_division, resource.data.previous_depot_id)
+                  || canAccessScope(resource.data.new_division, resource.data.new_depot_id);
+      allow create: if canWriteScope(request.resource.data.previous_division, request.resource.data.previous_depot_id)
+                    && (request.resource.data.transfer_type == 'INTRA_DIVISION' || isHQ());
+      allow update, delete: if false;
+    }
+
+    match /service_history/{srvId} {
+      allow read: if canAccessScope(resource.data.division_code, resource.data.depot_id);
+      allow create: if canWriteScope(request.resource.data.division_code, request.resource.data.depot_id);
+      allow update, delete: if false;
+    }
+
+    match /audit_log/{logId} {
+      allow read: if isHQ() || canAccessScope(resource.data.division_code, resource.data.depot_id);
+      allow create: if isActive();
+      allow update, delete: if false; // Append-only & immutable
+    }
+
+    match /auth_otp_codes/{email} {
+      allow read, write: if false; // Accessed strictly via Firebase Admin SDK on server
+    }
+  }
+}

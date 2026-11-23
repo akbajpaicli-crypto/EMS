@@ -1,0 +1,83 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "employee_master",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "division_code",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "depot_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "employment_status",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "employee_master",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "employment_status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "pme_due_date",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "drafting_history",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "drafting_status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "expected_return_date",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "sanctioned_strength",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "is_current",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "division_code",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "depot_id",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "audit_log",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "division_code",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "timestamp",
+          "order": "DESCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

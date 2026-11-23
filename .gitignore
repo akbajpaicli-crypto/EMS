@@ -1,0 +1,5 @@
+node_modules
+.next
+.env*
+wcr_ems_*.json
+!src/data/wcr-snapshot.json
